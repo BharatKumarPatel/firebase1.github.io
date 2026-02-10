@@ -31,7 +31,10 @@ body {
     background: var(--bg-color);
     color: var(--text-main);
     height: 100vh;
-    overflow: hidden; /* Scroll sirf content area mein hoga */
+
+    /* --- SIRF YEH CHANGE HAI (Desktop View ke liye) --- */
+    min-width: 1280px;   /* Screen ko 1280px se chhota hone se rokega */
+    overflow-x: auto;    /* Mobile mein side scroll allow karega */
 }
 
 /* UTILS */
@@ -263,4 +266,5 @@ body {
         padding: 15px 20px; flex-direction: column; gap: 15px;
     }
     .btn-save { width: 100%; }
+
 }
