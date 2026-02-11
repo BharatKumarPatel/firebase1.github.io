@@ -230,10 +230,21 @@
                 try {
                     const dbRef = ref(db);
                     
-                    // Admin
-                    const adm = await get(child(dbRef, "system_config/admin_profile"));
-                    if(adm.exists() && adm.val().email == e && adm.val().password == p) 
-                        return app.loadSuccess("system_config/admin_profile", "ADMIN", adm.val());
+                    // 1. Admin Check (UPDATED)
+const adm = await get(child(dbRef, "system_config/admin_profile"));
+if(adm.exists() && adm.val().email == e && adm.val().password == p) {
+    // Judge Bot ka data bhi laao
+    const judge = await get(child(dbRef, "system_config/judge_bot"));
+    const adminData = adm.val();
+    
+    // Admin data mein Judge ki Key aur Model daal do taaki box mein dikhe
+    if(judge.exists()) {
+        adminData.apiKey = judge.val().apiKey;
+        adminData.model = judge.val().model;
+    }
+    return app.loadSuccess("system_config/admin_profile", "ADMIN", adminData);
+}
+
 
                     // Student
                     const stu = await get(child(dbRef, "students"));
@@ -330,12 +341,17 @@
                 const newLink = document.getElementById("p_link").value;
 
                 if(userRole === "ADMIN") {
-                    u[`${p}/city`] = newCity;
-                    u[`${p}/bio`] = newBio;
-                    u[`${p}/password`] = pass;
-                    u[`${p}/apiKey`] = newKey;
-                    u[`${p}/model`] = newModel;
-                } else {
+    // Admin ki personal info apni profile mein
+    u[`${p}/city`] = document.getElementById("p_city").value;
+    u[`${p}/bio`] = document.getElementById("p_bio").value;
+    u[`${p}/password`] = pass;
+    
+    // LEKIN... API Key aur Model ko Judge Bot mein bhejo (NOT Admin Profile)
+    u[`system_config/judge_bot/apiKey`] = document.getElementById("ai_key").value;
+    u[`system_config/judge_bot/model`] = document.getElementById("ai_model").value;
+    u[`system_config/judge_bot/systemPrompt`] = document.getElementById("ai_global").value;
+}
+ else {
                     u[`${p}/public_info/city`] = newCity;
                     u[`${p}/public_info/bio`] = newBio;
                     if(userRole === "STUDENT") {
