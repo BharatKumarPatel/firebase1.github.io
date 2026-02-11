@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280">
+    <title>VYUHA | STRATEGIC CONSOLE</title>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="loader" class="sys-overlay">
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <div class="mono-label">LOADING VYUHA OS v19...</div>
+        </div>
+    </div>
+
+    <div id="login" class="sys-overlay">
+        <div class="login-panel">
+            <div class="login-brand">
+                <img src="logo.png" alt="VYUHA">
+            </div>
+            <h1>SYSTEM ACCESS</h1>
+            
+            <div class="input-stack">
+                <input type="email" id="email" placeholder="USER ID (EMAIL)" autocomplete="off">
+                <input type="password" id="pass" placeholder="SECURITY KEY">
+            </div>
+            
+            <button id="btnLogin" class="btn-hero">INITIALIZE LINK</button>
+            <div id="loginMsg" class="err-txt"></div>
+        </div>
+    </div>
+
+    <div id="app" class="interface-layer hidden">
+        
+        <aside class="left-panel">
+            <div class="lp-header">
+                <img src="logo.png" alt="Logo">
+            </div>
+
+            <div class="lp-user">
+                <div id="uAvatar" class="av-box"></div>
+                <div class="u-meta">
+                    <div id="uName" class="u-txt">USER</div>
+                    <div id="uRole" class="role-tag">UNIT</div>
+                </div>
+            </div>
+
+            <nav class="lp-nav">
+                <button class="nav-row active" onclick="app.tab('profile')">
+                    <i class="ph-bold ph-user-circle"></i>
+                    <span>PROFILE</span>
+                </button>
+                <button class="nav-row" onclick="app.tab('ai')">
+                    <i class="ph-bold ph-cpu"></i>
+                    <span>NEURAL</span>
+                </button>
+                <button id="navAdmin" class="nav-row hidden" onclick="app.tab('admin')">
+                    <i class="ph-bold ph-gavel"></i>
+                    <span>WAR ROOM</span>
+                </button>
+            </nav>
+
+            <div class="lp-footer">
+                <button onclick="app.logout()" class="btn-logout">
+                    <i class="ph-bold ph-power"></i> DISCONNECT
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-canvas">
+            <div class="scroll-container">
+                
+                <section id="tab-profile" class="tab-view">
+                    <div class="view-header">
+                        <h2>UNIT IDENTITY</h2>
+                        <span class="mono-sub">PUBLIC & PRIVATE CONFIGURATION</span>
+                    </div>
+
+                    <div id="statsBar" class="stats-strip hidden">
+                        <div class="stat-unit">
+                            <label>RANK</label> <span id="valRank">--</span>
+                        </div>
+                        <div class="stat-unit">
+                            <label>WINS</label> <span id="valWins">0</span>
+                        </div>
+                        <div class="stat-unit">
+                            <label>MATCHES</label> <span id="valMatches">0</span>
+                        </div>
+                        <div class="stat-unit">
+                            <label>STATUS</label> <span id="valStatus" class="txt-ok">ACTIVE</span>
+                        </div>
+                    </div>
+
+                    <div class="grid-form">
+                        <div class="row-split">
+                            <div class="inp-wrap">
+                                <label>UNIT NAME <span class="tag-lock">LOCKED</span></label>
+                                <input type="text" id="p_name" disabled class="inp-lock">
+                            </div>
+                            <div class="inp-wrap">
+                                <label>BOT IDENTITY <span class="tag-lock">LOCKED</span></label>
+                                <input type="text" id="p_bot" disabled class="inp-lock">
+                            </div>
+                        </div>
+
+                        <div class="row-split">
+                            <div class="inp-wrap">
+                                <label>BASE LOCATION</label>
+                                <input type="text" id="p_city">
+                            </div>
+                            <div class="inp-wrap" id="grp_link">
+                                <label>AFFILIATION</label>
+                                <input type="text" id="p_link">
+                            </div>
+                        </div>
+
+                        <div class="row-split">
+                            <div class="inp-wrap">
+                                <label>EMAIL ID</label>
+                                <input type="text" id="p_email" disabled class="inp-lock">
+                            </div>
+                            <div class="inp-wrap" id="grp_mob">
+                                <label>MOBILE CONTACT</label>
+                                <input type="text" id="p_mobile">
+                            </div>
+                        </div>
+
+                        <div class="inp-wrap full" id="grp_logo">
+                            <label>VISUAL REPRESENTATION (AVATAR)</label>
+                            <div id="logoDeck" class="logo-deck"></div>
+                            <input type="hidden" id="p_logo_val">
+                        </div>
+
+                        <div class="inp-wrap full">
+                            <label>BIO / MANIFESTO</label>
+                            <textarea id="p_bio"></textarea>
+                        </div>
+
+                        <div class="inp-wrap full highlight-zone">
+                            <label>UPDATE SECURITY KEY</label>
+                            <input type="text" id="p_pass" placeholder="NEW STRONG PASSWORD">
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-ai" class="tab-view hidden">
+                    <div class="view-header">
+                        <h2>NEURAL LOGIC</h2>
+                        <span class="mono-sub">INTELLIGENCE & STRATEGY</span>
+                    </div>
+
+                    <div class="grid-form">
+                        <div class="inp-wrap full">
+                            <label>GEMINI API KEY <span class="tag-vis">VISIBLE</span></label>
+                            <input type="text" id="ai_key" class="inp-code" placeholder="PASTE KEY...">
+                        </div>
+                        <div class="inp-wrap full">
+                            <label>MODEL VERSION</label>
+                            <input type="text" id="ai_model" class="inp-code" value="gemini-2.5-flash">
+                        </div>
+                        <div class="inp-wrap full">
+                            <label>GLOBAL SYSTEM PROMPT</label>
+                            <textarea id="ai_global" class="inp-code area"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="sect-divider">ROOM SPECIFIC STRATEGIES</div>
+                    <div id="roomPromptsList" class="grid-form"></div>
+                </section>
+
+                <section id="tab-admin" class="tab-view hidden">
+                    <div class="view-header">
+                        <h2>WAR ROOM CONTROL</h2>
+                        <span class="mono-sub">SECTOR MANAGEMENT</span>
+                    </div>
+
+                    <div class="control-panel">
+                        <h3>DEPLOY NEW SECTOR</h3>
+                        <div class="control-row">
+                            <input type="text" id="new_r_name" placeholder="ROOM NAME">
+                            <input type="text" id="new_r_topic" placeholder="TOPIC FOCUS">
+                            <select id="new_r_diff">
+                                <option>Easy</option><option>Medium</option><option>Hard</option>
+                            </select>
+                            <button onclick="app.addRoom()">DEPLOY</button>
+                        </div>
+                    </div>
+
+                    <div class="sect-divider">ACTIVE SECTORS</div>
+                    <div id="adminRoomList" class="room-stack"></div>
+                </section>
+
+                <div style="height: 150px;"></div>
+            </div>
+        </main>
+
+        <div class="bottom-bar">
+            <div class="supp-link">
+                <i class="ph-bold ph-lifebuoy"></i> HELP: IBBCHOUDHARY@GMAIL.COM
+            </div>
+            <button onclick="app.save()" id="btnSave" class="btn-save">SAVE CHANGES</button>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, update, set, remove, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdK4ZRrRcmisVVOW_hTMIowtts2I4iGzA",
+            authDomain: "ai-quizz-97fb9.firebaseapp.com",
+            databaseURL: "https://ai-quizz-97fb9-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ai-quizz-97fb9",
+            storageBucket: "ai-quizz-97fb9.firebasestorage.app",
+            messagingSenderId: "572423560278",
+            appId: "1:572423560278:web:c15c0e8a14b452068f2ff7"
+        };
+
+        const db = getDatabase(initializeApp(firebaseConfig));
+        let curr = null, path = null, role = null;
+
+        window.app = {
+            init: () => {
+                const s = sessionStorage.getItem("v_sess");
+                if(s) { const d = JSON.parse(s); app.load(d.p, d.r, d.u); }
+                else { document.getElementById("loader").classList.add("hidden"); }
+            },
+
+            login: async () => {
+                const e = document.getElementById("email").value.trim();
+                const p = document.getElementById("pass").value.trim();
+                const msg = document.getElementById("loginMsg");
+                const btn = document.getElementById("btnLogin");
+                
+                if(!e || !p) return msg.innerText = "MISSING INPUT";
+                btn.innerText = "VERIFYING..."; msg.innerText = "";
+
+                try {
+                    // Admin
+                    const adm = await get(child(ref(db), "system_config/admin_profile"));
+                    if(adm.exists() && adm.val().email == e && adm.val().password == p) 
+                        return app.load("system_config/admin_profile", "ADMIN", adm.val());
+
+                    // Students
+                    const st = await get(child(ref(db), "students"));
+                    if(st.exists()) {
+                        for(const [k, v] of Object.entries(st.val())) {
+                            if(v.private_info.email == e && v.private_info.password == p) 
+                                return app.load(`students/${k}`, "STUDENT", {...v.public_info, ...v.private_info, key: k});
+                        }
+                    }
+
+                    // Schools
+                    const sc = await get(child(ref(db), "schools"));
+                    if(sc.exists()) {
+                        for(const [k, v] of Object.entries(sc.val())) {
+                            if(v.private_info.email == e && v.private_info.password == p) 
+                                return app.load(`schools/${k}`, "SCHOOL", {...v.public_info, ...v.private_info, key: k});
+                        }
+                    }
+
+                    msg.innerText = "INVALID CREDENTIALS"; btn.innerText = "INITIALIZE LINK";
+                } catch(err) { console.error(err); msg.innerText = "NETWORK ERROR"; btn.innerText = "INITIALIZE LINK"; }
+            },
+
+            load: (p, r, u) => {
+                curr = u; path = p; role = r;
+                sessionStorage.setItem("v_sess", JSON.stringify({p, r, u}));
+                document.getElementById("login").classList.add("hidden");
+                document.getElementById("loader").classList.add("hidden");
+                document.getElementById("app").classList.remove("hidden");
+
+                // Render User
+                const n = u.name || u.key || "USER";
+                const av = u.avatarUrl || u.logoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${n}`;
+                document.getElementById("uName").innerText = n;
+                document.getElementById("uRole").innerText = r;
+                document.getElementById("uAvatar").style.backgroundImage = `url('${av}')`;
+
+                // Common Inputs
+                document.getElementById("p_name").value = n;
+                document.getElementById("p_city").value = u.city || "";
+                document.getElementById("p_email").value = u.email || "";
+                document.getElementById("p_pass").value = u.password || "";
+                document.getElementById("p_bio").value = u.bio || "";
+                document.getElementById("ai_key").value = u.apiKey || "";
+                document.getElementById("ai_model").value = u.model || "gemini-2.5-flash";
+                document.getElementById("ai_global").value = u.globalPrompt || "";
+
+                if(r === "ADMIN") {
+                    document.getElementById("navAdmin").classList.remove("hidden");
+                    document.getElementById("statsBar").classList.add("hidden");
+                    document.getElementById("grp_link").classList.add("hidden");
+                    document.getElementById("grp_mob").classList.add("hidden");
+                    document.getElementById("grp_logo").classList.add("hidden");
+                    document.getElementById("p_bot").value = "SUPREME AI JUSTICE";
+                    app.listAdminRooms();
+                } else {
+                    document.getElementById("p_bot").value = u.botName || "NOT_SET";
+                    document.getElementById("p_mobile").value = u.mobile || "";
+                    document.getElementById("valRank").innerText = u.currentRank || "N/A";
+                    document.getElementById("valWins").innerText = u.wins || "0";
+                    document.getElementById("valMatches").innerText = u.matches || "0";
+                    
+                    if(r === "STUDENT") {
+                        document.getElementById("p_link").value = u.linkedSchool || u.className || "";
+                    } else {
+                        document.getElementById("grp_link").classList.add("hidden");
+                    }
+                    app.renderLogos();
+                }
+                app.listPrompts();
+            },
+
+            // --- DATA RENDER FIXES ---
+            listPrompts: async () => {
+                const b = document.getElementById("roomPromptsList");
+                const s = await get(child(ref(db), "rooms"));
+                if(s.exists()) {
+                    b.innerHTML = "";
+                    Object.entries(s.val()).forEach(([k, v]) => {
+                        const val = (curr.roomPrompts && curr.roomPrompts[k]) || "";
+                        // FIXED: Showing System Prompt (Topic) as Context
+                        b.innerHTML += `
+                            <div class="inp-wrap full">
+                                <label>STRATEGY: ${k} <span style="font-weight:400; color:#888">(${v.difficulty})</span></label>
+                                <div style="font-size:0.75rem; color:#666; margin-bottom:5px; font-family:'JetBrains Mono'">TOPIC: ${v.systemPrompt}</div>
+                                <textarea class="r-inp" data-room="${k}">${val}</textarea>
+                            </div>
+                        `;
+                    });
+                }
+            },
+
+            listAdminRooms: async () => {
+                const b = document.getElementById("adminRoomList");
+                const s = await get(child(ref(db), "rooms"));
+                if(s.exists()) {
+                    b.innerHTML = "";
+                    Object.entries(s.val()).forEach(([k, v]) => {
+                        // FIXED: Showing Topic Data Clearly
+                        b.innerHTML += `
+                            <div class="room-card">
+                                <div class="rc-info">
+                                    <h3>${k}</h3>
+                                    <div class="rc-topic">TOPIC: ${v.systemPrompt}</div>
+                                    <span class="tag">${v.difficulty}</span>
+                                </div>
+                                <div class="rc-act">
+                                    <button onclick="app.tog('${k}',${!v.active})">${v.active?"DISABLE":"ENABLE"}</button>
+                                    <button onclick="app.del('${k}')" class="red">DELETE</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            },
+
+            save: async () => {
+                const btn = document.getElementById("btnSave");
+                const pass = document.getElementById("p_pass").value;
+                if(pass && pass.length < 8) { alert("WEAK PASSWORD"); return; }
+
+                btn.innerText = "SAVING...";
+                const u = {}; const p = path;
+
+                if(role === "ADMIN") {
+                    u[`${p}/city`] = document.getElementById("p_city").value;
+                    u[`${p}/bio`] = document.getElementById("p_bio").value;
+                    u[`${p}/password`] = pass || curr.password;
+                    u[`${p}/apiKey`] = document.getElementById("ai_key").value;
+                    u[`${p}/model`] = document.getElementById("ai_model").value;
+                } else {
+                    u[`${p}/public_info/city`] = document.getElementById("p_city").value;
+                    u[`${p}/public_info/bio`] = document.getElementById("p_bio").value;
+                    if(role === "STUDENT") {
+                        u[`${p}/public_info/linkedSchool`] = document.getElementById("p_link").value;
+                        u[`${p}/public_info/avatarUrl`] = document.getElementById("p_logo_val").value;
+                    } else {
+                        u[`${p}/public_info/logoUrl`] = document.getElementById("p_logo_val").value;
+                    }
+                    u[`${p}/private_info/mobile`] = document.getElementById("p_mobile").value;
+                    u[`${p}/private_info/password`] = pass || curr.password;
+                    u[`${p}/private_info/apiKey`] = document.getElementById("ai_key").value;
+                    u[`${p}/private_info/model`] = document.getElementById("ai_model").value;
+                    u[`${p}/private_info/globalPrompt`] = document.getElementById("ai_global").value;
+                    
+                    document.querySelectorAll(".r-inp").forEach(el => {
+                        u[`${p}/private_info/roomPrompts/${el.dataset.room}`] = el.value;
+                    });
+                }
+
+                try {
+                    await update(ref(db), u);
+                    btn.innerText = "SAVED!"; btn.style.background = "#00CC66";
+                    setTimeout(() => { btn.innerText = "SAVE CHANGES"; btn.style.background = "#000"; location.reload(); }, 1500);
+                } catch(e) { alert(e.message); btn.innerText = "RETRY"; }
+            },
+
+            addRoom: async () => {
+                const n = document.getElementById("new_r_name").value;
+                const t = document.getElementById("new_r_topic").value;
+                const d = document.getElementById("new_r_diff").value;
+                if(n && t) {
+                    await set(ref(db, `rooms/${n}`), { difficulty: d, systemPrompt: t, active: true });
+                    app.listAdminRooms();
+                }
+            },
+            tog: async (n, s) => { await update(ref(db, `rooms/${n}`), {active: s}); app.listAdminRooms(); },
+            del: async (n) => { if(confirm("DELETE?")) { await remove(ref(db, `rooms/${n}`)); app.listAdminRooms(); } },
+            
+            tab: (id) => {
+                document.querySelectorAll(".tab-view").forEach(e => e.classList.add("hidden"));
+                document.getElementById(`tab-${id}`).classList.remove("hidden");
+                document.querySelectorAll(".nav-row").forEach(e => e.classList.remove("active"));
+                if(id=='profile') document.querySelectorAll(".nav-row")[0].classList.add("active");
+                if(id=='ai') document.querySelectorAll(".nav-row")[1].classList.add("active");
+                if(id=='admin') document.getElementById("navAdmin").classList.add("active");
+            },
+            logout: () => { sessionStorage.removeItem("v_sess"); location.reload(); },
+            renderLogos: () => {
+                const s = ['Rohan', 'Priya', 'Max', 'Zoe', 'Titan', 'Leo'];
+                const b = document.getElementById("logoDeck");
+                const i = document.getElementById("p_logo_val");
+                i.value = curr.avatarUrl || curr.logoUrl || "";
+                b.innerHTML = "";
+                s.forEach(seed => {
+                    const u = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+                    const d = document.createElement("div"); d.className = "logo-card";
+                    if(i.value === u) d.classList.add("selected");
+                    d.innerHTML = `<img src="${u}">`;
+                    d.onclick = () => {
+                        document.querySelectorAll(".logo-card").forEach(e => e.classList.remove("selected"));
+                        d.classList.add("selected"); i.value = u;
+                    };
+                    b.appendChild(d);
+                });
+            }
+        };
+
+        document.getElementById("btnLogin").onclick = app.login;
+        window.onload = app.init;
+    </script>
+</body>
+</html>
