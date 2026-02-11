@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280">
+    <title>VYUHA | MASTER CONSOLE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="loader" class="sys-overlay">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <div class="mono-label">ESTABLISHING UPLINK...</div>
+        </div>
+    </div>
+
+    <div id="login" class="sys-overlay">
+        <div class="login-panel">
+            <div class="login-brand">
+                <img src="logo.png" alt="VYUHA SYSTEM">
+            </div>
+            <h1>ACCESS TERMINAL</h1>
+            <p class="mono-sub">SECURE DATA GATEWAY v20.0</p>
+            
+            <div class="input-stack">
+                <input type="email" id="email" placeholder="USER ID (EMAIL)" autocomplete="off">
+                <input type="password" id="pass" placeholder="ACCESS KEY (PASSWORD)">
+            </div>
+            
+            <button id="btnLogin" class="btn-hero">INITIALIZE CONNECTION</button>
+            <div id="loginMsg" class="err-txt"></div>
+        </div>
+    </div>
+
+    <div id="app" class="interface-layer hidden">
+        
+        <aside class="sidebar-panel">
+            <div class="brand-header">
+                <img src="logo.png" alt="Logo">
+            </div>
+
+            <div class="user-widget">
+                <div id="uAvatar" class="avatar-box"></div>
+                <div class="user-info">
+                    <div id="uName" class="u-name">LOADING...</div>
+                    <div id="uRole" class="u-role">UNIT</div>
+                </div>
+            </div>
+
+            <nav class="nav-stack">
+                <button class="nav-item active" onclick="app.tab('profile')">
+                    <i class="ph-bold ph-user-circle"></i>
+                    <span>IDENTITY</span>
+                </button>
+                <button class="nav-item" onclick="app.tab('neural')">
+                    <i class="ph-bold ph-brain"></i>
+                    <span>NEURAL LOGIC</span>
+                </button>
+                <button id="navAdmin" class="nav-item hidden" onclick="app.tab('warroom')">
+                    <i class="ph-bold ph-gavel"></i>
+                    <span>WAR ROOM</span>
+                </button>
+
+                <div style="height:1px; background:#E5E5E5; margin:15px 25px;"></div>
+
+                <button onclick="app.logout()" class="nav-item btn-disconnect">
+                    <i class="ph-bold ph-sign-out"></i>
+                    <span>DISCONNECT</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="content-canvas">
+            <div class="content-container">
+
+                <section id="tab-profile" class="tab-view">
+                    <div class="view-head">
+                        <h2>IDENTITY CONFIG</h2>
+                        <span class="mono-sub">PUBLIC PROFILE & CREDENTIALS</span>
+                    </div>
+
+                    <div id="statsBar" class="stats-row hidden">
+                        <div class="stat-card">
+                            <label>RANK</label><span id="vRank">--</span>
+                        </div>
+                        <div class="stat-card">
+                            <label>WINS</label><span id="vWins">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <label>MATCHES</label><span id="vMatches">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <label>STATUS</label><span id="vStatus" class="txt-active">ACTIVE</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="col-2">
+                            <div class="inp-group">
+                                <label>UNIT NAME <span class="tag-lock">LOCKED</span></label>
+                                <input type="text" id="p_name" disabled class="inp-lock">
+                            </div>
+                            <div class="inp-group">
+                                <label>BOT IDENTITY <span class="tag-lock">LOCKED</span></label>
+                                <input type="text" id="p_bot" disabled class="inp-lock">
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="inp-group">
+                                <label>BASE LOCATION</label>
+                                <input type="text" id="p_city">
+                            </div>
+                            <div class="inp-group" id="grp_school">
+                                <label>AFFILIATION</label>
+                                <input type="text" id="p_link">
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="inp-group">
+                                <label>EMAIL ID</label>
+                                <input type="text" id="p_email" disabled class="inp-lock">
+                            </div>
+                            <div class="inp-group" id="grp_mobile">
+                                <label>MOBILE CONTACT</label>
+                                <input type="text" id="p_mobile">
+                            </div>
+                        </div>
+
+                        <div class="inp-group" id="grp_logo">
+                            <label>VISUAL AVATAR SELECTOR</label>
+                            <div id="logoDeck" class="logo-list"></div>
+                            <input type="hidden" id="p_logo_val">
+                        </div>
+
+                        <div class="inp-group full">
+                            <label>BIO / MANIFESTO</label>
+                            <textarea id="p_bio" class="inp-area"></textarea>
+                        </div>
+
+                        <div class="inp-group full highlight-zone">
+                            <label>UPDATE ACCESS KEY</label>
+                            <input type="text" id="p_pass" placeholder="ENTER NEW STRONG PASSWORD">
+                            <div class="hint-txt">Must contain 8+ characters, symbol & number.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-neural" class="tab-view hidden">
+                    <div class="view-head">
+                        <h2>NEURAL CONFIG</h2>
+                        <span class="mono-sub">API KEYS & BATTLE STRATEGIES</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="inp-group full">
+                            <label>GEMINI API KEY <span class="tag-vis">VISIBLE</span></label>
+                            <input type="text" id="ai_key" class="inp-code" placeholder="PASTE YOUR API KEY HERE...">
+                        </div>
+                        <div class="inp-group full">
+                            <label>MODEL VERSION</label>
+                            <input type="text" id="ai_model" class="inp-code" value="gemini-2.5-flash">
+                        </div>
+                        <div class="inp-group full">
+                            <label>GLOBAL SYSTEM PROMPT (BASE BEHAVIOR)</label>
+                            <textarea id="ai_global" class="inp-code inp-area"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="section-divider">ROOM SPECIFIC STRATEGIES</div>
+                    
+                    <div id="roomPromptsList" class="form-grid"></div>
+                </section>
+
+                <section id="tab-warroom" class="tab-view hidden">
+                    <div class="view-head">
+                        <h2>WAR ROOM CONTROL</h2>
+                        <span class="mono-sub">DEPLOY & MANAGE SECTORS</span>
+                    </div>
+
+                    <div class="admin-control-box">
+                        <h3>DEPLOY NEW SECTOR</h3>
+                        <div class="control-row">
+                            <input type="text" id="new_r_name" placeholder="ROOM NAME">
+                            <input type="text" id="new_r_topic" placeholder="TOPIC / SYSTEM PROMPT">
+                            <select id="new_r_diff">
+                                <option>Easy</option><option>Medium</option><option>Hard</option>
+                            </select>
+                            <button onclick="app.addRoom()">DEPLOY</button>
+                        </div>
+                    </div>
+
+                    <div class="section-divider">ACTIVE BATTLEGROUNDS</div>
+                    <div id="adminRoomList" class="room-stack"></div>
+                </section>
+
+                <div style="height: 150px;"></div>
+            </div>
+        </main>
+
+        <div class="action-bar">
+            <div class="support-link">
+                <i class="ph-bold ph-lifebuoy"></i> HELP: <a href="mailto:ibbchoudhary@gmail.com">IBBCHOUDHARY@GMAIL.COM</a>
+            </div>
+            <button id="btnSave" onclick="app.saveData()" class="btn-save">SAVE CHANGES</button>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, update, set, remove, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdK4ZRrRcmisVVOW_hTMIowtts2I4iGzA",
+            authDomain: "ai-quizz-97fb9.firebaseapp.com",
+            databaseURL: "https://ai-quizz-97fb9-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ai-quizz-97fb9",
+            storageBucket: "ai-quizz-97fb9.firebasestorage.app",
+            messagingSenderId: "572423560278",
+            appId: "1:572423560278:web:c15c0e8a14b452068f2ff7"
+        };
+
+        const db = getDatabase(initializeApp(firebaseConfig));
+        
+        // GLOBAL STATE
+        let currentUser = null;
+        let userPath = null;
+        let userRole = null; // 'ADMIN', 'STUDENT', 'SCHOOL'
+
+        window.app = {
+            
+            // --- INIT ---
+            init: () => {
+                const sess = sessionStorage.getItem("vyuha_v20");
+                if(sess) {
+                    const d = JSON.parse(sess);
+                    app.loadSuccess(d.path, d.role, d.user);
+                } else {
+                    document.getElementById("loader").classList.add("hidden");
+                }
+            },
+
+            // --- LOGIN LOGIC (Fixed for JSON Structure) ---
+            login: async () => {
+                const email = document.getElementById("email").value.trim();
+                const pass = document.getElementById("pass").value.trim();
+                const msg = document.getElementById("loginMsg");
+                const btn = document.getElementById("btnLogin");
+
+                if(!email || !pass) { msg.innerText = "CREDENTIALS REQUIRED"; return; }
+                
+                btn.innerText = "VERIFYING ENCRYPTION...";
+                msg.innerText = "";
+
+                try {
+                    const dbRef = ref(db);
+                    
+                    // 1. Check Admin
+                    const admSnap = await get(child(dbRef, "system_config/admin_profile"));
+                    if(admSnap.exists()) {
+                        const adm = admSnap.val();
+                        if(adm.email === email && adm.password === pass) {
+                            return app.loadSuccess("system_config/admin_profile", "ADMIN", adm);
+                        }
+                    }
+
+                    // 2. Check Students (Loop through all)
+                    const stuSnap = await get(child(dbRef, "students"));
+                    if(stuSnap.exists()) {
+                        const students = stuSnap.val();
+                        for (const [key, val] of Object.entries(students)) {
+                            // Check PRIVATE info for auth
+                            if (val.private_info && val.private_info.email === email && val.private_info.password === pass) {
+                                // Merge Public & Private for easier handling
+                                const merged = { ...val.public_info, ...val.private_info, key: key };
+                                return app.loadSuccess(`students/${key}`, "STUDENT", merged);
+                            }
+                        }
+                    }
+
+                    // 3. Check Schools
+                    const schSnap = await get(child(dbRef, "schools"));
+                    if(schSnap.exists()) {
+                        const schools = schSnap.val();
+                        for (const [key, val] of Object.entries(schools)) {
+                            if (val.private_info && val.private_info.email === email && val.private_info.password === pass) {
+                                const merged = { ...val.public_info, ...val.private_info, key: key };
+                                return app.loadSuccess(`schools/${key}`, "SCHOOL", merged);
+                            }
+                        }
+                    }
+
+                    msg.innerText = "ACCESS DENIED: INVALID ID";
+                    btn.innerText = "INITIALIZE CONNECTION";
+
+                } catch(e) {
+                    console.error(e);
+                    msg.innerText = "NETWORK ERROR";
+                    btn.innerText = "INITIALIZE CONNECTION";
+                }
+            },
+
+            // --- LOAD DASHBOARD ---
+            loadSuccess: (path, role, data) => {
+                currentUser = data; userPath = path; userRole = role;
+                sessionStorage.setItem("vyuha_v20", JSON.stringify({path, role, user: data}));
+
+                document.getElementById("login").classList.add("hidden");
+                document.getElementById("loader").classList.add("hidden");
+                document.getElementById("app").classList.remove("hidden");
+
+                // Render Header
+                const name = data.name || data.key || "USER";
+                const avUrl = data.avatarUrl || data.logoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${name}`;
+                document.getElementById("uName").innerText = name;
+                document.getElementById("uRole").innerText = role;
+                document.getElementById("uAvatar").style.backgroundImage = `url('${avUrl}')`;
+
+                // Common Inputs
+                document.getElementById("p_name").value = name;
+                document.getElementById("p_city").value = data.city || "";
+                document.getElementById("p_email").value = data.email || "";
+                document.getElementById("p_pass").value = data.password || "";
+                document.getElementById("p_bio").value = data.bio || "";
+                document.getElementById("ai_key").value = data.apiKey || "";
+                document.getElementById("ai_model").value = data.model || "gemini-2.5-flash";
+                document.getElementById("ai_global").value = data.globalPrompt || "";
+
+                // Role Specific UI
+                if(role === "ADMIN") {
+                    document.getElementById("navAdmin").classList.remove("hidden");
+                    document.getElementById("statsBar").classList.add("hidden");
+                    document.getElementById("grp_school").classList.add("hidden");
+                    document.getElementById("grp_mobile").classList.add("hidden");
+                    document.getElementById("grp_logo").classList.add("hidden");
+                    document.getElementById("p_bot").value = "SUPREME AI JUSTICE";
+                    app.loadAdminRooms();
+                } else {
+                    // Student & School
+                    document.getElementById("p_bot").value = data.botName || "NOT_SET";
+                    document.getElementById("p_mobile").value = data.mobile || "";
+                    document.getElementById("vRank").innerText = data.currentRank || "N/A";
+                    document.getElementById("vWins").innerText = data.wins || "0";
+                    document.getElementById("vMatches").innerText = data.matches || "0";
+                    
+                    if(data.isBanned) {
+                        document.getElementById("vStatus").innerText = "BANNED";
+                        document.getElementById("vStatus").style.color = "red";
+                    }
+
+                    if(role === "STUDENT") {
+                        document.getElementById("p_link").value = data.linkedSchool || data.className || "";
+                    } else {
+                        document.getElementById("grp_school").classList.add("hidden");
+                    }
+                    app.renderLogos();
+                }
+
+                // Load Room Prompts (Crucial)
+                app.loadRoomPrompts();
+            },
+
+            // --- DATA SAVING (The Fix for JSON Structure) ---
+            saveData: async () => {
+                const btn = document.getElementById("btnSave");
+                const pass = document.getElementById("p_pass").value;
+
+                if(pass && (pass.length < 8 || !/\d/.test(pass) || !/[!@#$%^&*]/.test(pass))) {
+                    alert("WEAK PASSWORD: Use 8+ chars, number & symbol."); return;
+                }
+
+                btn.innerText = "SAVING TO DATABASE...";
+                
+                const u = {}; // Updates object
+                const p = userPath;
+
+                if(userRole === "ADMIN") {
+                    u[`${p}/city`] = document.getElementById("p_city").value;
+                    u[`${p}/bio`] = document.getElementById("p_bio").value;
+                    u[`${p}/password`] = pass || currentUser.password;
+                    u[`${p}/apiKey`] = document.getElementById("ai_key").value;
+                    u[`${p}/model`] = document.getElementById("ai_model").value;
+                } else {
+                    // PUBLIC INFO
+                    u[`${p}/public_info/city`] = document.getElementById("p_city").value;
+                    u[`${p}/public_info/bio`] = document.getElementById("p_bio").value;
+                    
+                    if(userRole === "STUDENT") {
+                        u[`${p}/public_info/linkedSchool`] = document.getElementById("p_link").value;
+                        u[`${p}/public_info/avatarUrl`] = document.getElementById("p_logo_val").value;
+                    } else {
+                        u[`${p}/public_info/logoUrl`] = document.getElementById("p_logo_val").value;
+                    }
+
+                    // PRIVATE INFO
+                    u[`${p}/private_info/mobile`] = document.getElementById("p_mobile").value;
+                    u[`${p}/private_info/password`] = pass || currentUser.password;
+                    u[`${p}/private_info/apiKey`] = document.getElementById("ai_key").value;
+                    u[`${p}/private_info/model`] = document.getElementById("ai_model").value;
+                    u[`${p}/private_info/globalPrompt`] = document.getElementById("ai_global").value;
+
+                    // ROOM PROMPTS (Saving to private_info/roomPrompts/RoomName)
+                    document.querySelectorAll(".r-prompt-inp").forEach(el => {
+                        const roomName = el.dataset.room;
+                        u[`${p}/private_info/roomPrompts/${roomName}`] = el.value;
+                    });
+                }
+
+                try {
+                    await update(ref(db), u);
+                    btn.innerText = "SYSTEM UPDATED";
+                    btn.style.background = "#00CC66";
+                    setTimeout(() => { btn.innerText = "SAVE CHANGES"; btn.style.background = "#000"; location.reload(); }, 1500);
+                } catch(e) {
+                    alert("SAVE FAILED: " + e.message);
+                    btn.innerText = "RETRY SAVE";
+                }
+            },
+
+            // --- UI HELPERS ---
+            loadRoomPrompts: async () => {
+                const box = document.getElementById("roomPromptsList");
+                const snap = await get(child(ref(db), "rooms"));
+                if(snap.exists()) {
+                    box.innerHTML = "";
+                    const rooms = snap.val();
+                    Object.entries(rooms).forEach(([key, val]) => {
+                        // Check if user has a saved prompt for this room
+                        const savedPrompt = (currentUser.roomPrompts && currentUser.roomPrompts[key]) || "";
+                        
+                        box.innerHTML += `
+                            <div class="inp-group full">
+                                <label>STRATEGY: ${key.toUpperCase()} <span style="font-weight:400; color:#888;">(${val.difficulty})</span></label>
+                                <div style="font-size:0.75rem; color:#666; font-family:'JetBrains Mono'; margin-bottom:5px;">
+                                    TOPIC: ${val.systemPrompt}
+                                </div>
+                                <textarea class="inp-area r-prompt-inp" data-room="${key}" placeholder="Enter your AI strategy for this room...">${savedPrompt}</textarea>
+                            </div>
+                        `;
+                    });
+                }
+            },
+
+            loadAdminRooms: async () => {
+                const box = document.getElementById("adminRoomList");
+                const snap = await get(child(ref(db), "rooms"));
+                if(snap.exists()) {
+                    box.innerHTML = "";
+                    Object.entries(snap.val()).forEach(([k, v]) => {
+                        box.innerHTML += `
+                            <div class="room-item">
+                                <div class="ri-info">
+                                    <h3>${k}</h3>
+                                    <p>${v.systemPrompt}</p>
+                                    <span class="tag">${v.difficulty}</span>
+                                </div>
+                                <div class="ri-act">
+                                    <button onclick="app.togRoom('${k}',${!v.active})" class="btn-sm">${v.active?"DISABLE":"ENABLE"}</button>
+                                    <button onclick="app.delRoom('${k}')" class="btn-sm red">DELETE</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            },
+
+            addRoom: async () => {
+                const n = document.getElementById("new_r_name").value;
+                const t = document.getElementById("new_r_topic").value;
+                const d = document.getElementById("new_r_diff").value;
+                if(n && t) {
+                    await set(ref(db, `rooms/${n}`), { difficulty:d, systemPrompt: t, active:true });
+                    app.loadAdminRooms();
+                }
+            },
+            togRoom: async (n,s) => { await update(ref(db, `rooms/${n}`), {active:s}); app.loadAdminRooms(); },
+            delRoom: async (n) => { if(confirm("DELETE?")) { await remove(ref(db, `rooms/${n}`)); app.loadAdminRooms(); } },
+
+            renderLogos: () => {
+                const seeds = ['Rohan', 'Priya', 'Max', 'Zoe', 'Titan', 'Leo'];
+                const box = document.getElementById("logoDeck");
+                const inp = document.getElementById("p_logo_val");
+                inp.value = currentUser.avatarUrl || currentUser.logoUrl || "";
+                box.innerHTML = "";
+                seeds.forEach(s => {
+                    const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${s}`;
+                    const d = document.createElement("div"); d.className = "logo-opt";
+                    if(inp.value === url) d.classList.add("selected");
+                    d.innerHTML = `<img src="${url}">`;
+                    d.onclick = () => {
+                        document.querySelectorAll(".logo-opt").forEach(e => e.classList.remove("selected"));
+                        d.classList.add("selected"); inp.value = url;
+                    };
+                    box.appendChild(d);
+                });
+            },
+
+            tab: (id) => {
+                document.querySelectorAll(".tab-view").forEach(e => e.classList.add("hidden"));
+                document.getElementById(`tab-${id}`).classList.remove("hidden");
+                document.querySelectorAll(".nav-item").forEach(e => e.classList.remove("active"));
+                
+                if(id==='profile') document.querySelectorAll(".nav-item")[0].classList.add("active");
+                if(id==='neural') document.querySelectorAll(".nav-item")[1].classList.add("active");
+                if(id==='warroom') document.getElementById("navAdmin").classList.add("active");
+            },
+
+            logout: () => { sessionStorage.removeItem("vyuha_v20"); location.reload(); }
+        };
+
+        document.getElementById("btnLogin").onclick = app.login;
+        window.onload = app.init;
+    </script>
+</body>
+</html>
