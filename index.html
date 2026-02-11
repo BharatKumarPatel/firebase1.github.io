@@ -15,7 +15,7 @@
     <div id="loader" class="sys-overlay">
         <div class="loader-box">
             <div class="spinner"></div>
-            <div class="mono-label">CONNECTING TO VYUHA NET...</div>
+            <div class="mono-label">SYNCING DATA STREAMS...</div>
         </div>
     </div>
 
@@ -24,14 +24,14 @@
             <div class="login-brand">
                 <img src="logo.png" alt="VYUHA">
             </div>
-            <h1>SYSTEM LOGIN</h1>
+            <h1>SYSTEM ACCESS</h1>
             
             <div class="input-stack">
                 <input type="email" id="email" placeholder="ENTER EMAIL ID" autocomplete="off">
                 <input type="password" id="pass" placeholder="ENTER PASSWORD">
             </div>
             
-            <button id="btnLogin" class="btn-hero">ACCESS DASHBOARD</button>
+            <button id="btnLogin" class="btn-hero">ESTABLISH LINK</button>
             <div id="loginMsg" class="err-txt"></div>
         </div>
     </div>
@@ -53,7 +53,7 @@
 
             <nav class="nav-stack">
                 <button class="nav-item active" onclick="app.tab('profile')">
-                    <i class="ph-bold ph-user-circle"></i> <span>PROFILE</span>
+                    <i class="ph-bold ph-user-circle"></i> <span>IDENTITY</span>
                 </button>
                 <button class="nav-item" onclick="app.tab('neural')">
                     <i class="ph-bold ph-brain"></i> <span>NEURAL</span>
@@ -65,7 +65,7 @@
                 <div class="sep-line"></div>
                 
                 <button onclick="app.logout()" class="nav-item btn-disconnect">
-                    <i class="ph-bold ph-sign-out"></i> <span>LOGOUT</span>
+                    <i class="ph-bold ph-sign-out"></i> <span>DISCONNECT</span>
                 </button>
             </nav>
         </aside>
@@ -198,8 +198,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get, update, set, remove, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+        // !!! YOUR API KEY HERE !!!
         const firebaseConfig = {
-            apiKey: "PASTE_YOUR_API_KEY_HERE", // <--- API KEY YAHAN DALNA
+            apiKey: "AIzaSyBdK4ZRrRcmisVVOW_hTMIowtts2I4iGzA",
             authDomain: "ai-quizz-97fb9.firebaseapp.com",
             databaseURL: "https://ai-quizz-97fb9-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "ai-quizz-97fb9",
@@ -213,7 +214,7 @@
 
         window.app = {
             init: () => {
-                const s = sessionStorage.getItem("v_sess_v2");
+                const s = sessionStorage.getItem("v_sess_v3");
                 if(s) { const d = JSON.parse(s); app.loadSuccess(d.path, d.role, d.user); }
                 else { document.getElementById("loader").classList.add("hidden"); }
             },
@@ -228,24 +229,24 @@
 
                 try {
                     const dbRef = ref(db);
-                    // 1. Admin Check
+                    
+                    // Admin
                     const adm = await get(child(dbRef, "system_config/admin_profile"));
                     if(adm.exists() && adm.val().email == e && adm.val().password == p) 
                         return app.loadSuccess("system_config/admin_profile", "ADMIN", adm.val());
 
-                    // 2. Student Check (Looping keys)
+                    // Student
                     const stu = await get(child(dbRef, "students"));
                     if(stu.exists()) {
                         for(const [k, v] of Object.entries(stu.val())) {
                             if(v.private_info.email == e && v.private_info.password == p) {
-                                // Merging strategies correctly
                                 const strategies = v.private_info.strategies || {};
                                 return app.loadSuccess(`students/${k}`, "STUDENT", {...v.public_info, ...v.private_info, strategies, key: k});
                             }
                         }
                     }
 
-                    // 3. School Check
+                    // School
                     const sch = await get(child(dbRef, "schools"));
                     if(sch.exists()) {
                         for(const [k, v] of Object.entries(sch.val())) {
@@ -262,7 +263,8 @@
 
             loadSuccess: (path, role, data) => {
                 currentUser = data; userPath = path; userRole = role;
-                sessionStorage.setItem("v_sess_v2", JSON.stringify({path, role, user: data}));
+                // Save to Session Storage
+                sessionStorage.setItem("v_sess_v3", JSON.stringify({path, role, user: data}));
 
                 document.getElementById("login").classList.add("hidden");
                 document.getElementById("loader").classList.add("hidden");
@@ -275,7 +277,7 @@
                 document.getElementById("uRole").innerText = role;
                 document.getElementById("uAvatar").style.backgroundImage = `url('${av}')`;
 
-                // Fill Common Forms
+                // Common Inputs
                 document.getElementById("p_name").value = n;
                 document.getElementById("p_city").value = data.city || "";
                 document.getElementById("p_email").value = data.email || "";
@@ -308,52 +310,85 @@
                 app.loadRoomPrompts();
             },
 
-            // --- SAVE LOGIC (SPLIT PUBLIC/PRIVATE) ---
+            // --- THE FIX: MEMORY UPDATE ---
             saveData: async () => {
                 const btn = document.getElementById("btnSave");
                 const pass = document.getElementById("p_pass").value;
-                if(!pass) { alert("PASSWORD REQUIRED"); return; } // Removed weak password check for you
+                if(!pass) { alert("PASSWORD REQUIRED"); return; }
 
                 btn.innerText = "SAVING...";
                 const u = {}; const p = userPath;
 
-                if(userRole === "ADMIN") {
-                    u[`${p}/city`] = document.getElementById("p_city").value;
-                    u[`${p}/bio`] = document.getElementById("p_bio").value;
-                    u[`${p}/password`] = pass;
-                    u[`${p}/apiKey`] = document.getElementById("ai_key").value;
-                    u[`${p}/model`] = document.getElementById("ai_model").value;
-                } else {
-                    // PUBLIC
-                    u[`${p}/public_info/city`] = document.getElementById("p_city").value;
-                    u[`${p}/public_info/bio`] = document.getElementById("p_bio").value;
-                    if(userRole === "STUDENT") {
-                        u[`${p}/public_info/linkedSchool`] = document.getElementById("p_link").value;
-                        u[`${p}/public_info/avatarUrl`] = document.getElementById("p_logo_val").value;
-                    } else {
-                        u[`${p}/public_info/logoUrl`] = document.getElementById("p_logo_val").value;
-                    }
-                    // PRIVATE
-                    u[`${p}/private_info/mobile`] = document.getElementById("p_mobile").value;
-                    u[`${p}/private_info/password`] = pass;
-                    u[`${p}/private_info/apiKey`] = document.getElementById("ai_key").value;
-                    u[`${p}/private_info/model`] = document.getElementById("ai_model").value;
-                    u[`${p}/private_info/globalPrompt`] = document.getElementById("ai_global").value;
+                // 1. Gather Data & Prepare Updates for Firebase
+                const newCity = document.getElementById("p_city").value;
+                const newBio = document.getElementById("p_bio").value;
+                const newKey = document.getElementById("ai_key").value;
+                const newModel = document.getElementById("ai_model").value;
+                const newGlobal = document.getElementById("ai_global").value;
+                const newMobile = document.getElementById("p_mobile").value;
+                const newLogo = document.getElementById("p_logo_val").value;
+                const newLink = document.getElementById("p_link").value;
 
-                    // STRATEGIES (New Logic)
+                if(userRole === "ADMIN") {
+                    u[`${p}/city`] = newCity;
+                    u[`${p}/bio`] = newBio;
+                    u[`${p}/password`] = pass;
+                    u[`${p}/apiKey`] = newKey;
+                    u[`${p}/model`] = newModel;
+                } else {
+                    u[`${p}/public_info/city`] = newCity;
+                    u[`${p}/public_info/bio`] = newBio;
+                    if(userRole === "STUDENT") {
+                        u[`${p}/public_info/linkedSchool`] = newLink;
+                        u[`${p}/public_info/avatarUrl`] = newLogo;
+                    } else {
+                        u[`${p}/public_info/logoUrl`] = newLogo;
+                    }
+                    u[`${p}/private_info/mobile`] = newMobile;
+                    u[`${p}/private_info/password`] = pass;
+                    u[`${p}/private_info/apiKey`] = newKey;
+                    u[`${p}/private_info/model`] = newModel;
+                    u[`${p}/private_info/globalPrompt`] = newGlobal;
+
                     document.querySelectorAll(".r-prompt").forEach(el => {
                         u[`${p}/private_info/strategies/${el.dataset.room}`] = el.value;
                     });
                 }
 
                 try {
+                    // 2. SEND TO FIREBASE
                     await update(ref(db), u);
+                    
+                    // 3. !!! CRITICAL FIX: UPDATE LOCAL MEMORY (SESSION) !!!
+                    currentUser.city = newCity;
+                    currentUser.bio = newBio;
+                    currentUser.password = pass;
+                    currentUser.apiKey = newKey;
+                    currentUser.model = newModel;
+                    currentUser.globalPrompt = newGlobal;
+                    if(userRole !== "ADMIN") {
+                        currentUser.mobile = newMobile;
+                        if(userRole === "STUDENT") currentUser.linkedSchool = newLink;
+                        currentUser.avatarUrl = newLogo; // Or logoUrl
+                        currentUser.logoUrl = newLogo;
+                        
+                        // Update Local Strategies
+                        if(!currentUser.strategies) currentUser.strategies = {};
+                        document.querySelectorAll(".r-prompt").forEach(el => {
+                            currentUser.strategies[el.dataset.room] = el.value;
+                        });
+                    }
+
+                    // 4. SAVE NEW STATE TO SESSION STORAGE
+                    sessionStorage.setItem("v_sess_v3", JSON.stringify({path: userPath, role: userRole, user: currentUser}));
+
+                    // 5. RELOAD
                     btn.innerText = "SAVED!"; btn.style.background = "#00CC66";
-                    setTimeout(()=>{ btn.innerText="SAVE CHANGES"; btn.style.background="#000"; location.reload(); }, 1500);
+                    setTimeout(()=>{ location.reload(); }, 1000);
+
                 } catch(e) { alert(e.message); btn.innerText="RETRY"; }
             },
 
-            // --- ROOM LOGIC (FIXED) ---
             loadRoomPrompts: async () => {
                 const box = document.getElementById("roomPromptsList");
                 const snap = await get(child(ref(db), "rooms"));
@@ -361,15 +396,13 @@
                     box.innerHTML = "";
                     Object.entries(snap.val()).forEach(([key, val]) => {
                         const saved = (currentUser.strategies && currentUser.strategies[key]) || "";
-                        
                         box.innerHTML += `
                         <div class="inp-group full highlight-zone">
                             <label>ROOM: ${key.toUpperCase()}</label>
                             <div style="font-size:0.9rem; color:#555; margin-bottom:10px; font-family:'JetBrains Mono'">
-                                <strong>TOPIC (Judge):</strong> ${val.topic || val.systemPrompt}
+                                <strong>TOPIC:</strong> ${val.topic || val.systemPrompt}
                             </div>
-                            <label style="font-size:0.7rem; color:#888;">YOUR STRATEGY:</label>
-                            <textarea class="inp-area r-prompt" data-room="${key}" placeholder="My secret plan for this room...">${saved}</textarea>
+                            <textarea class="inp-area r-prompt" data-room="${key}" placeholder="My strategy...">${saved}</textarea>
                         </div>`;
                     });
                 }
@@ -396,21 +429,14 @@
                     });
                 }
             },
-
             addRoom: async () => {
                 const n = document.getElementById("new_r_name").value;
                 const t = document.getElementById("new_r_topic").value;
                 const d = document.getElementById("new_r_diff").value;
-                if(n && t) {
-                    // Saves 'topic' properly now
-                    await set(ref(db, `rooms/${n}`), { difficulty:d, topic: t, active:true });
-                    app.loadAdminRooms();
-                }
+                if(n && t) { await set(ref(db, `rooms/${n}`), { difficulty:d, topic: t, active:true }); app.loadAdminRooms(); }
             },
-
             togRoom: async (n,s) => { await update(ref(db, `rooms/${n}`), {active:s}); app.loadAdminRooms(); },
             delRoom: async (n) => { if(confirm("DELETE?")) await remove(ref(db, `rooms/${n}`)); app.loadAdminRooms(); },
-
             renderLogos: () => {
                 const s = ['Rohan', 'Priya', 'Max', 'Zoe', 'Titan', 'Leo'];
                 const b = document.getElementById("logoDeck");
@@ -429,7 +455,6 @@
                     b.appendChild(d);
                 });
             },
-
             tab: (id) => {
                 document.querySelectorAll(".tab-view").forEach(e => e.classList.add("hidden"));
                 document.getElementById(`tab-${id}`).classList.remove("hidden");
@@ -438,7 +463,7 @@
                 if(id==='neural') document.querySelectorAll(".nav-item")[1].classList.add("active");
                 if(id==='warroom') document.getElementById("navAdmin").classList.add("active");
             },
-            logout: () => { sessionStorage.removeItem("v_sess_v2"); location.reload(); }
+            logout: () => { sessionStorage.removeItem("v_sess_v3"); location.reload(); }
         };
 
         document.getElementById("btnLogin").onclick = app.login;
