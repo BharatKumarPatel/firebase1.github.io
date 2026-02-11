@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VYUHA | CONTROL CENTER</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="loader" class="overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">INITIALIZING VYUHA...</div>
+    </div>
+
+    <div id="login" class="overlay">
+        <div class="login-box">
+            <div class="brand-header">
+                <img src="logo.png" alt="VYUHA" class="brand-logo">
+            </div>
+            <h1>ACCESS TERMINAL</h1>
+            <p class="subtitle">SECURE GATEWAY v18.0</p>
+            
+            <div class="input-stack">
+                <input type="email" id="email" placeholder="IDENTIFIER (EMAIL)" autocomplete="off">
+                <input type="password" id="pass" placeholder="ACCESS KEY">
+            </div>
+            
+            <button id="btnLogin" class="btn-main">ESTABLISH CONNECTION</button>
+            <div id="loginMsg" class="msg-box"></div>
+        </div>
+    </div>
+
+    <div id="app" class="app-layout hidden">
+        
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="logo.png" alt="Logo">
+            </div>
+
+            <div class="user-card desktop-only">
+                <div id="uAvatar" class="avatar"></div>
+                <div class="user-text">
+                    <div id="uName">USER</div>
+                    <div id="uRole" class="role-badge">UNIT</div>
+                </div>
+            </div>
+
+            <nav class="desktop-nav">
+                <button class="nav-link active" onclick="app.switchTab('profile')">
+                    <i class="ph-bold ph-identification-card"></i>
+                    <span>IDENTITY</span>
+                </button>
+                <button class="nav-link" onclick="app.switchTab('ai')">
+                    <i class="ph-bold ph-brain"></i>
+                    <span>NEURAL</span>
+                </button>
+                <button id="navAdmin" class="nav-link hidden" onclick="app.switchTab('admin')">
+                    <i class="ph-bold ph-command"></i>
+                    <span>WAR ROOM</span>
+                </button>
+            </nav>
+
+            <div class="bottom-action desktop-only">
+                <button onclick="app.logout()" class="btn-ghost">
+                    <i class="ph-bold ph-sign-out"></i> EXIT
+                </button>
+            </div>
+        </aside>
+
+        <main class="content">
+            <div class="container">
+                
+                <div class="mobile-header mobile-only">
+                    <div class="mh-left">
+                        <div id="uAvatarMob" class="avatar-sm"></div>
+                        <div>
+                            <div id="uNameMob" class="u-name-mob">User</div>
+                            <div id="uRoleMob" class="role-mob">Unit</div>
+                        </div>
+                    </div>
+                    <button onclick="app.logout()" class="icon-btn"><i class="ph-bold ph-sign-out"></i></button>
+                </div>
+
+                <section id="tab-profile" class="tab-section">
+                    <div class="section-title">
+                        <h2>IDENTITY CONFIG</h2>
+                        <span class="mono">MANAGE CREDENTIALS</span>
+                    </div>
+
+                    <div id="statsGrid" class="stats-row hidden">
+                        <div class="stat-card">
+                            <label>RANK</label>
+                            <span id="vRank">--</span>
+                        </div>
+                        <div class="stat-card">
+                            <label>WINS</label>
+                            <span id="vWins">0</span>
+                        </div>
+                        <div class="stat-box">
+                            <label>STATUS</label>
+                            <span id="vStatus" class="status-ok">ACTIVE</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="col-2">
+                            <div class="inp-group">
+                                <label>UNIT NAME <span class="badge">LOCKED</span></label>
+                                <input type="text" id="p_name" disabled class="locked">
+                            </div>
+                            <div class="inp-group">
+                                <label>BOT ID <span class="badge">LOCKED</span></label>
+                                <input type="text" id="p_botName" disabled class="locked">
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="inp-group">
+                                <label>CITY</label>
+                                <input type="text" id="p_city">
+                            </div>
+                            <div class="inp-group" id="grp_school">
+                                <label>AFFILIATION</label>
+                                <input type="text" id="p_link">
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="inp-group">
+                                <label>EMAIL</label>
+                                <input type="text" id="p_email" disabled class="locked">
+                            </div>
+                            <div class="inp-group" id="grp_mobile">
+                                <label>MOBILE</label>
+                                <input type="text" id="p_mobile">
+                            </div>
+                        </div>
+
+                        <div class="inp-group" id="grp_logo">
+                            <label>SELECT AVATAR</label>
+                            <div id="logoList" class="logo-scroll"></div>
+                            <input type="hidden" id="p_logo_val">
+                        </div>
+
+                        <div class="inp-group">
+                            <label>BIO</label>
+                            <textarea id="p_bio"></textarea>
+                        </div>
+
+                        <div class="inp-group highlight">
+                            <label>CHANGE PASSWORD</label>
+                            <input type="text" id="p_pass" placeholder="NEW PASSWORD">
+                            <div class="info">Must include Symbol & Number</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-ai" class="tab-section hidden">
+                    <div class="section-title">
+                        <h2>NEURAL LOGIC</h2>
+                        <span class="mono">API & STRATEGY</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="inp-group">
+                            <label>GEMINI API KEY <span class="badge visible">VISIBLE</span></label>
+                            <input type="text" id="ai_key" class="code-font" placeholder="PASTE KEY...">
+                        </div>
+                        <div class="inp-group">
+                            <label>MODEL VERSION</label>
+                            <input type="text" id="ai_model" class="code-font" value="gemini-2.5-flash">
+                        </div>
+                        <div class="inp-group">
+                            <label>GLOBAL PROMPT</label>
+                            <textarea id="ai_global" class="code-font"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="divider">ROOM OVERRIDES</div>
+                    <div id="roomPrompts" class="form-grid"></div>
+                </section>
+
+                <section id="tab-admin" class="tab-section hidden">
+                    <div class="section-title">
+                        <h2>WAR ROOM</h2>
+                        <span class="mono">ADMIN CONTROL</span>
+                    </div>
+
+                    <div class="admin-box">
+                        <h3>NEW SECTOR</h3>
+                        <div class="col-3-btn">
+                            <input type="text" id="new_r_name" placeholder="NAME">
+                            <input type="text" id="new_r_topic" placeholder="TOPIC">
+                            <select id="new_r_diff">
+                                <option>Easy</option><option>Medium</option><option>Hard</option>
+                            </select>
+                            <button onclick="app.createRoom()">ADD</button>
+                        </div>
+                    </div>
+
+                    <div class="divider">ACTIVE SECTORS</div>
+                    <div id="adminRoomList" class="room-list"></div>
+                </section>
+
+                <div class="spacer-bottom"></div>
+            </div>
+        </main>
+
+        <div class="action-bar">
+            <div class="support desktop-only">
+                <span>SUPPORT: IBBCHOUDHARY@GMAIL.COM</span>
+            </div>
+            <button id="btnSave" onclick="app.saveData()" class="btn-action">SAVE CHANGES</button>
+        </div>
+
+        <nav class="mobile-nav mobile-only">
+            <button class="mn-item active" onclick="app.switchTab('profile')">
+                <i class="ph-bold ph-identification-card"></i>
+                <span>Profile</span>
+            </button>
+            <button class="mn-item" onclick="app.switchTab('ai')">
+                <i class="ph-bold ph-brain"></i>
+                <span>Neural</span>
+            </button>
+            <button id="mnAdmin" class="mn-item hidden" onclick="app.switchTab('admin')">
+                <i class="ph-bold ph-command"></i>
+                <span>Admin</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, update, set, remove, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // YOUR API KEY INTEGRATED
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdK4ZRrRcmisVVOW_hTMIowtts2I4iGzA",
+            authDomain: "ai-quizz-97fb9.firebaseapp.com",
+            databaseURL: "https://ai-quizz-97fb9-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ai-quizz-97fb9",
+            storageBucket: "ai-quizz-97fb9.firebasestorage.app",
+            messagingSenderId: "572423560278",
+            appId: "1:572423560278:web:c15c0e8a14b452068f2ff7"
+        };
+
+        const appInstance = initializeApp(firebaseConfig);
+        const db = getDatabase(appInstance);
+
+        let currentUser = null, userPath = null, userRole = null;
+
+        window.app = {
+            init: () => {
+                const s = sessionStorage.getItem("vyuha_sess");
+                if(s) { const d = JSON.parse(s); app.loadSuccess(d.path, d.role, d.user); }
+                else { document.getElementById("loader").classList.add("hidden"); }
+            },
+
+            login: async () => {
+                const e = document.getElementById("email").value.trim();
+                const p = document.getElementById("pass").value.trim();
+                const msg = document.getElementById("loginMsg");
+                const btn = document.getElementById("btnLogin");
+
+                if(!e || !p) { msg.innerText = "MISSING CREDENTIALS"; return; }
+                btn.innerText = "VERIFYING..."; msg.innerText = "";
+
+                try {
+                    // Admin
+                    const adm = await get(child(ref(db), "system_config/admin_profile"));
+                    if(adm.exists() && adm.val().email === e && adm.val().password === p) {
+                        app.loadSuccess("system_config/admin_profile", "ADMIN", adm.val()); return;
+                    }
+                    // Students
+                    const st = await get(child(ref(db), "students"));
+                    if(st.exists()) {
+                        for(const [k, v] of Object.entries(st.val())) {
+                            if(v.private_info.email === e && v.private_info.password === p) {
+                                app.loadSuccess(`students/${k}`, "STUDENT", {...v.public_info, ...v.private_info, key: k}); return;
+                            }
+                        }
+                    }
+                    // Schools
+                    const sc = await get(child(ref(db), "schools"));
+                    if(sc.exists()) {
+                        for(const [k, v] of Object.entries(sc.val())) {
+                            if(v.private_info.email === e && v.private_info.password === p) {
+                                app.loadSuccess(`schools/${k}`, "SCHOOL", {...v.public_info, ...v.private_info, key: k}); return;
+                            }
+                        }
+                    }
+                    msg.innerText = "ACCESS DENIED"; btn.innerText = "CONNECT";
+                } catch(err) { console.error(err); msg.innerText = "NETWORK ERROR"; btn.innerText = "CONNECT"; }
+            },
+
+            loadSuccess: (path, role, data) => {
+                currentUser = data; userPath = path; userRole = role;
+                sessionStorage.setItem("vyuha_sess", JSON.stringify({path, role, user: data}));
+
+                document.getElementById("login").classList.add("hidden");
+                document.getElementById("loader").classList.add("hidden");
+                document.getElementById("app").classList.remove("hidden");
+                
+                // Render User Info
+                const n = data.name || data.key || "USER";
+                const av = data.avatarUrl || data.logoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${n}`;
+                
+                // Desktop Sidebar
+                document.getElementById("uName").innerText = n;
+                document.getElementById("uRole").innerText = role;
+                document.getElementById("uAvatar").style.backgroundImage = `url('${av}')`;
+
+                // Mobile Header
+                if(document.getElementById("uNameMob")) {
+                    document.getElementById("uNameMob").innerText = n;
+                    document.getElementById("uRoleMob").innerText = role;
+                    document.getElementById("uAvatarMob").style.backgroundImage = `url('${av}')`;
+                }
+
+                // Fill Forms
+                document.getElementById("p_name").value = n;
+                document.getElementById("p_city").value = data.city || "";
+                document.getElementById("p_email").value = data.email || "";
+                document.getElementById("p_pass").value = data.password || "";
+                document.getElementById("p_bio").value = data.bio || "";
+                document.getElementById("ai_key").value = data.apiKey || "";
+                document.getElementById("ai_model").value = data.model || "gemini-2.5-flash";
+                document.getElementById("ai_global").value = data.globalPrompt || "";
+
+                if(role === "ADMIN") {
+                    document.getElementById("navAdmin").classList.remove("hidden");
+                    document.getElementById("mnAdmin").classList.remove("hidden"); // Mobile Nav
+                    document.getElementById("statsGrid").classList.add("hidden");
+                    document.getElementById("grp_school").classList.add("hidden");
+                    document.getElementById("grp_mobile").classList.add("hidden");
+                    document.getElementById("grp_logo").classList.add("hidden");
+                    document.getElementById("p_botName").value = "SUPREME AI JUSTICE";
+                    app.loadAdminRooms();
+                } else if (role === "STUDENT") {
+                    document.getElementById("p_botName").value = data.botName || "NOT_SET";
+                    document.getElementById("p_mobile").value = data.mobile || "";
+                    document.getElementById("p_link").value = data.linkedSchool || data.className || "";
+                    document.getElementById("vRank").innerText = data.currentRank || "N/A";
+                    document.getElementById("vWins").innerText = data.wins || "0";
+                    document.getElementById("vStatus").innerText = data.isBanned ? "BANNED" : "ACTIVE";
+                    if(data.isBanned) document.getElementById("vStatus").style.color = "red";
+                    app.renderLogos();
+                } else {
+                    document.getElementById("grp_school").classList.add("hidden");
+                    document.getElementById("p_botName").value = data.botName || "NOT_SET";
+                    document.getElementById("p_mobile").value = data.mobile || "";
+                    document.getElementById("vRank").innerText = data.currentRank || "N/A";
+                    document.getElementById("vWins").innerText = data.wins || "0";
+                    app.renderLogos();
+                }
+                app.loadRoomPrompts();
+            },
+
+            saveData: async () => {
+                const btn = document.getElementById("btnSave");
+                const pass = document.getElementById("p_pass").value;
+                if(pass && (pass.length < 8 || !/\d/.test(pass) || !/[!@#$%^&*]/.test(pass))) {
+                    alert("WEAK PASSWORD: Use 8+ chars, number, symbol"); return;
+                }
+
+                btn.innerText = "SAVING...";
+                const u = {}; const p = userPath;
+
+                // Admin
+                if(userRole === "ADMIN") {
+                    u[`${p}/city`] = document.getElementById("p_city").value;
+                    u[`${p}/bio`] = document.getElementById("p_bio").value;
+                    u[`${p}/password`] = pass || currentUser.password;
+                    u[`${p}/apiKey`] = document.getElementById("ai_key").value;
+                    u[`${p}/model`] = document.getElementById("ai_model").value;
+                } else {
+                    u[`${p}/public_info/city`] = document.getElementById("p_city").value;
+                    u[`${p}/public_info/bio`] = document.getElementById("p_bio").value;
+                    if(userRole === "STUDENT") {
+                        u[`${p}/public_info/linkedSchool`] = document.getElementById("p_link").value;
+                        u[`${p}/public_info/avatarUrl`] = document.getElementById("p_logo_val").value;
+                    } else {
+                        u[`${p}/public_info/logoUrl`] = document.getElementById("p_logo_val").value;
+                    }
+                    u[`${p}/private_info/mobile`] = document.getElementById("p_mobile").value;
+                    u[`${p}/private_info/password`] = pass || currentUser.password;
+                    u[`${p}/private_info/apiKey`] = document.getElementById("ai_key").value;
+                    u[`${p}/private_info/model`] = document.getElementById("ai_model").value;
+                    u[`${p}/private_info/globalPrompt`] = document.getElementById("ai_global").value;
+                    
+                    document.querySelectorAll(".r-prompt").forEach(el => {
+                        u[`${p}/private_info/roomPrompts/${el.dataset.room}`] = el.value;
+                    });
+                }
+
+                try {
+                    await update(ref(db), u);
+                    btn.innerText = "SAVED!"; btn.style.background = "#00CC66";
+                    setTimeout(() => { btn.innerText = "SAVE CHANGES"; btn.style.background = "#000"; location.reload(); }, 1500);
+                } catch(e) { alert(e.message); btn.innerText = "RETRY"; }
+            },
+
+            switchTab: (id) => {
+                document.querySelectorAll(".tab-section").forEach(e => e.classList.add("hidden"));
+                document.getElementById(`tab-${id}`).classList.remove("hidden");
+                
+                // Desktop Nav Active
+                document.querySelectorAll(".nav-link").forEach(e => e.classList.remove("active"));
+                
+                // Mobile Nav Active
+                document.querySelectorAll(".mn-item").forEach(e => e.classList.remove("active"));
+
+                // Set Active
+                const idx = id === 'profile' ? 0 : id === 'ai' ? 1 : 2;
+                document.querySelectorAll(".nav-link")[idx]?.classList.add("active");
+                document.querySelectorAll(".mn-item")[idx]?.classList.add("active");
+            },
+
+            logout: () => { sessionStorage.removeItem("vyuha_sess"); location.reload(); },
+
+            renderLogos: () => {
+                const seeds = ['Rohan', 'Priya', 'Max', 'Zoe', 'Titan', 'Leo'];
+                const box = document.getElementById("logoList");
+                const inp = document.getElementById("p_logo_val");
+                inp.value = currentUser.avatarUrl || currentUser.logoUrl || "";
+                box.innerHTML = "";
+                seeds.forEach(s => {
+                    const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${s}`;
+                    const d = document.createElement("div"); d.className = "logo-circle";
+                    if(inp.value === url) d.classList.add("selected");
+                    d.innerHTML = `<img src="${url}">`;
+                    d.onclick = () => {
+                        document.querySelectorAll(".logo-circle").forEach(e => e.classList.remove("selected"));
+                        d.classList.add("selected"); inp.value = url;
+                    };
+                    box.appendChild(d);
+                });
+            },
+
+            loadRoomPrompts: async () => {
+                const box = document.getElementById("roomPrompts");
+                const snap = await get(child(ref(db), "rooms"));
+                if(snap.exists()) {
+                    box.innerHTML = "";
+                    Object.keys(snap.val()).forEach(k => {
+                        const val = (currentUser.roomPrompts && currentUser.roomPrompts[k]) || "";
+                        box.innerHTML += `<div class="inp-group"><label>${k}</label><textarea class="input-std r-prompt" data-room="${k}">${val}</textarea></div>`;
+                    });
+                }
+            },
+
+            loadAdminRooms: async () => {
+                const box = document.getElementById("adminRoomList");
+                const snap = await get(child(ref(db), "rooms"));
+                box.innerHTML = "";
+                if(snap.exists()) {
+                    Object.entries(snap.val()).forEach(([k, v]) => {
+                        box.innerHTML += `
+                        <div class="room-row">
+                            <div><strong>${k}</strong> <span class="mono">${v.difficulty}</span></div>
+                            <div><button onclick="app.toggle('${k}',${!v.active})" class="btn-xs">${v.active?"ON":"OFF"}</button> <button onclick="app.del('${k}')" class="btn-xs red">DEL</button></div>
+                        </div>`;
+                    });
+                }
+            },
+            createRoom: async () => {
+                const n = document.getElementById("new_r_name").value, t = document.getElementById("new_r_topic").value, d = document.getElementById("new_r_diff").value;
+                if(n&&t) { await set(ref(db, `rooms/${n}`), {difficulty:d, systemPrompt:`Focus on ${t}`, active:true}); app.loadAdminRooms(); }
+            },
+            toggle: async (n,s) => { await update(ref(db, `rooms/${n}`), {active:s}); app.loadAdminRooms(); },
+            del: async (n) => { if(confirm("DEL?")) { await remove(ref(db, `rooms/${n}`)); app.loadAdminRooms(); } }
+        };
+
+        document.getElementById("btnLogin").onclick = app.login;
+        window.onload = app.init;
+    </script>
+</body>
+</html>
